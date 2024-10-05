@@ -1,3 +1,237 @@
+const puppeteer = require('puppeteer');
+const path = require('path');
+
+let browser;
+let page;
+
+const EXTENSION_PATH = path.join(__dirname, '..');
+const EXTENSION_ID = 'your-extension-id-here'; // Replace with your actual extension ID
+
+jest.setTimeout(30000); // Increase timeout for slower operations
+
+beforeAll(async () => {
+  browser = await puppeteer.launch({
+    headless: false,
+    args: [
+      `--disable-extensions-except=${EXTENSION_PATH}`,
+      `--load-extension=${EXTENSION_PATH}`,
+    ],
+  });
+});
+
+afterAll(async () => {
+  await browser.close();
+});
+
+beforeEach(async () => {
+  page = await browser.newPage();
+});
+
+afterEach(async () => {
+  await page.close();
+});
+
+describe('Enhanced Bookmarks Manager', () => {
+  describe('Bookmarks Page Enhancement', () => {
+    beforeEach(async () => {
+      await page.goto('about:newtab');
+      await page.waitForSelector('.bookmarks-view');
+    });
+
+    test('Bookmarks page is enhanced with custom styles', async () => {
+      const bookmarksView = await page.$('.bookmarks-view');
+      expect(bookmarksView).not.toBeNull();
+    });
+
+    test('Bookmark items are displayed correctly', async () => {
+      const bookmarkItems = await page.$$('.bookmark-item');
+      expect(bookmarkItems.length).toBeGreaterThan(0);
+    });
+
+    test('Bookmark folders can be expanded and collapsed', async () => {
+      const folderItem = await page.$('.bookmark-folder');
+      expect(folderItem).not.toBeNull();
+
+      await folderItem.click();
+      const expandedChildren = await page.$('.bookmark-children.open');
+      expect(expandedChildren).not.toBeNull();
+
+      await folderItem.click();
+      const collapsedChildren = await page.$('.bookmark-children:not(.open)');
+      expect(collapsedChildren).not.toBeNull();
+    });
+  });
+
+  describe('Save All Tabs Functionality', () => {
+    test('Save All Tabs menu item is created', async () => {
+      await page.evaluate(() => {
+        const menuCreated = browser.menus.create.mock.calls.some(call => 
+          call[0].id === 'save-all-tabs' && call[0].title === 'Save All Tabs'
+        );
+        return menuCreated;
+      });
+      expect(menuCreated).toBe(true);
+    });
+
+    test('Save All Tabs function is called when menu item is clicked', async () => {
+      await page.evaluate(() => {
+        window.saveAllTabs = jest.fn();
+        browser.menus.onClicked.dispatch({menuItemId: 'save-all-tabs'});
+      });
+
+      const saveAllTabsCalled = await page.evaluate(() => window.saveAllTabs.mock.calls.length > 0);
+      expect(saveAllTabsCalled).toBe(true);
+    });
+
+    test('Save All Tabs creates a new bookmark folder with all open tabs', async () => {
+      await page.evaluate(() => {
+        window.browser.tabs.query = jest.fn().mockResolvedValue([
+          { title: 'Tab 1', url: 'https://example.com/1' },
+          { title: 'Tab 2', url: 'https://example.com/2' },
+        ]);
+        window.browser.bookmarks.create = jest.fn().mockImplementation((bookmark) => {
+          if (!bookmark.url) return Promise.resolve({ id: 'folder-id' });
+          return Promise.resolve({ id: 'bookmark-id' });
+        });
+        saveAllTabs();
+      });
+
+      const bookmarksFolderCreated = await page.evaluate(() => 
+        browser.bookmarks.create.mock.calls.some(call => call[0].title.startsWith('Saved Tabs'))
+      );
+      expect(bookmarksFolderCreated).toBe(true);
+
+      const bookmarksCreated = await page.evaluate(() => 
+        browser.bookmarks.create.mock.calls.filter(call => call[0].url).length
+      );
+      expect(bookmarksCreated).toBe(2);
+    });
+  });
+
+  describe('Session Management', () => {
+    beforeEach(async () => {
+      await page.goto(`moz-extension://${EXTENSION_ID}/sessions/sessions.html`);
+    });
+
+    test('Session management page loads correctly', async () => {
+      const title = await page.$eval('h1', el => el.textContent);
+      expect(title).toBe('Session Management');
+    });
+
+    test('Can save current session', async () => {
+      await page.evaluate(() => {
+        window.browser.tabs.query = jest.fn().mockResolvedValue([
+          { title: 'Tab 1', url: 'https://example.com/1' },
+          { title: 'Tab 2', url: 'https://example.com/2' },
+        ]);
+        window.browser.storage.local.get = jest.fn().mockResolvedValue({ sessions: [] });
+        window.browser.storage.local.set = jest.fn();
+      });
+
+      await page.click('#save-session');
+
+      const sessionsSaved = await page.evaluate(() => {
+        const savedSessions = browser.storage.local.set.mock.calls[0][0].sessions;
+        return savedSessions.length === 1 && savedSessions[0].tabs.length === 2;
+      });
+      expect(sessionsSaved).toBe(true);
+    });
+
+    test('Saved sessions are displayed correctly', async () => {
+      await page.evaluate(() => {
+        window.browser.storage.local.get = jest.fn().mockResolvedValue({
+          sessions: [
+            { name: 'Session 1', tabs: [{ title: 'Tab 1', url: 'https://example.com/1' }] },
+            { name: 'Session 2', tabs: [{ title: 'Tab 2', url: 'https://example.com/2' }] },
+          ]
+        });
+        loadSessions();
+      });
+
+      await page.waitForSelector('.session-item');
+      const sessionItems = await page.$$('.session-item');
+      expect(sessionItems.length).toBe(2);
+    });
+
+    test('Can load a saved session', async () => {
+      await page.evaluate(() => {
+        window.browser.storage.local.get = jest.fn().mockResolvedValue({
+          sessions: [
+            { name: 'Test Session', tabs: [{ title: 'Test Tab', url: 'https://example.com' }] },
+          ]
+        });
+        window.browser.tabs.create = jest.fn();
+        loadSessions();
+      });
+
+      await page.waitForSelector('.load-session');
+      await page.click('.load-session');
+
+      const tabCreated = await page.evaluate(() => 
+        browser.tabs.create.mock.calls.length === 1 &&
+        browser.tabs.create.mock.calls[0][0].url === 'https://example.com'
+      );
+      expect(tabCreated).toBe(true);
+    });
+
+    test('Can delete a saved session', async () => {
+      await page.evaluate(() => {
+        window.browser.storage.local.get = jest.fn().mockResolvedValue({
+          sessions: [
+            { name: 'Test Session', tabs: [{ title: 'Test Tab', url: 'https://example.com' }] },
+          ]
+        });
+        window.browser.storage.local.set = jest.fn();
+        loadSessions();
+      });
+
+      await page.waitForSelector('.delete-session');
+      await page.click('.delete-session');
+
+      const sessionDeleted = await page.evaluate(() => {
+        const updatedSessions = browser.storage.local.set.mock.calls[0][0].sessions;
+        return updatedSessions.length === 0;
+      });
+      expect(sessionDeleted).toBe(true);
+    });
+  });
+
+  describe('Bookmark Search Functionality', () => {
+    beforeEach(async () => {
+      await page.goto('about:newtab');
+      await page.waitForSelector('.bookmarks-view');
+    });
+
+    test('Search input filters bookmarks correctly', async () => {
+      await page.evaluate(() => {
+        window.browser.bookmarks.getTree = jest.fn().mockResolvedValue([{
+          children: [
+            { title: 'Bookmark 1', url: 'https://example.com/1' },
+            { title: 'Bookmark 2', url: 'https://example.com/2' },
+            { title: 'Different', url: 'https://example.com/3' },
+          ]
+        }]);
+        renderBookmarks([{
+          children: [
+            { title: 'Bookmark 1', url: 'https://example.com/1' },
+            { title: 'Bookmark 2', url: 'https://example.com/2' },
+            { title: 'Different', url: 'https://example.com/3' },
+          ]
+        }], document.querySelector('.bookmarks-view'));
+      });
+
+      await page.type('#searchInput', 'Bookmark');
+
+      const visibleBookmarks = await page.$$eval('.bookmark-item', items => 
+        items.filter(item => item.style.display !== 'none').length
+      );
+      expect(visibleBookmarks).toBe(2);
+    });
+  });
+});
+
+
+
 describe('Session Management', () => {
   beforeEach(async () => {
     await page.goto(`moz-extension://${EXTENSION_ID}/sessions/sessions.html`);
