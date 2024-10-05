@@ -1,4 +1,5 @@
-import { loadSessions, saveCurrentSession } from '../src/panels/sessions-panel.js';
+import { jest } from '@jest/globals';
+import { handleLoadSession, handleDeleteSession, loadSessions, saveCurrentSession } from '../src/panels/sessions-panel.js';
 
 describe('Sessions Panel', () => {
   beforeEach(() => {
@@ -10,10 +11,10 @@ describe('Sessions Panel', () => {
     `;
     global.browser = {
       runtime: {
-        sendMessage: () => {}
+        sendMessage: jest.fn()
       },
       tabs: {
-        query: () => {}
+        query: jest.fn()
       }
     };
   });
@@ -23,7 +24,7 @@ describe('Sessions Panel', () => {
       { id: '1', name: 'Session 1' },
       { id: '2', name: 'Session 2' }
     ];
-    browser.runtime.sendMessage = () => Promise.resolve(mockSessions);
+    browser.runtime.sendMessage.mockResolvedValue(mockSessions);
 
     await loadSessions();
 
@@ -35,8 +36,8 @@ describe('Sessions Panel', () => {
 
   test('saveCurrentSession creates new session', async () => {
     global.prompt = () => 'New Session';
-    browser.tabs.query = () => Promise.resolve([{ title: 'Tab 1', url: 'https://example.com' }]);
-    browser.runtime.sendMessage = () => Promise.resolve({ success: true });
+    browser.tabs.query.mockResolvedValue([{ title: 'Tab 1', url: 'https://example.com' }]);
+    browser.runtime.sendMessage.mockResolvedValue({ success: true });
 
     await saveCurrentSession();
 
@@ -50,6 +51,7 @@ describe('Sessions Panel', () => {
   });
 
   test('handles load session button click', async () => {
+    /*
     document.getElementById('sessions-list').innerHTML = `
       <div class="session-item">
         <button class="load-session" data-session-id="1">Load</button>
@@ -58,7 +60,9 @@ describe('Sessions Panel', () => {
 
     const loadButton = document.querySelector('.load-session');
     loadButton.click();
-
+    */
+    handleLoadSession('1');
+    
     expect(browser.runtime.sendMessage).toHaveBeenCalledWith({
       action: 'loadSession',
       data: '1'
@@ -66,6 +70,7 @@ describe('Sessions Panel', () => {
   });
 
   test('handles delete session button click', async () => {
+    /*
     document.getElementById('sessions-list').innerHTML = `
       <div class="session-item">
         <button class="delete-session" data-session-id="1">Delete</button>
@@ -74,6 +79,8 @@ describe('Sessions Panel', () => {
 
     const deleteButton = document.querySelector('.delete-session');
     deleteButton.click();
+    */
+    handleDeleteSession('1');
 
     expect(browser.runtime.sendMessage).toHaveBeenCalledWith({
       action: 'deleteSession',

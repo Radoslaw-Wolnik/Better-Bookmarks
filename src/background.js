@@ -1,8 +1,5 @@
-// Optimization: Use object for action mapping instead of if-else
 const actionHandlers = {
-  getBookmarks: async () => {
-    return browser.bookmarks.getTree();
-  },
+  getBookmarks: () => Promise.resolve(browser.bookmarks.getTree()),
   getSessions: async () => {
     const result = await browser.storage.local.get('sessions');
     return result.sessions || [];
@@ -49,18 +46,27 @@ browser.menus.create({
 });
 
 async function saveAllTabs() {
-  const tabs = await browser.tabs.query({currentWindow: true});
-  const folderName = `Saved Tabs - ${new Date().toLocaleString()}`;
-  const folder = await browser.bookmarks.create({title: folderName});
+  try {
+    const tabs = await browser.tabs.query({currentWindow: true});
+    if (!tabs || tabs.length === 0) {
+      console.error('No tabs found');
+      return;
+    }
+    const folderName = `Saved Tabs - ${new Date().toLocaleString()}`;
+    const folder = await browser.bookmarks.create({title: folderName});
   
-  // Optimization: Use Promise.all for parallel bookmark creation
-  await Promise.all(tabs.map(tab => 
-    browser.bookmarks.create({
-      parentId: folder.id,
-      title: tab.title,
-      url: tab.url
-    })
-  ));
+    // Optimization: Use Promise.all for parallel bookmark creation
+    await Promise.all(tabs.map(tab => 
+      browser.bookmarks.create({
+        parentId: folder.id,
+        title: tab.title,
+        url: tab.url
+      })
+    ));
+    console.log('All tabs saved successfully');
+  } catch (error) {
+    console.error('Error saving tabs:', error);
+  }
 }
 
 export { actionHandlers, saveAllTabs };
