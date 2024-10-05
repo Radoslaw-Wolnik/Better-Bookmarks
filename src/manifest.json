@@ -1,8 +1,8 @@
 {
   "manifest_version": 2,
-  "name": "Enhanced Bookmarks Manager",
+  "name": "Better Bookmarks and Sessions",
   "version": "1.0",
-  "description": "Enhances Firefox's built-in bookmarks manager with improved UI and session management",
+  "description": "Makes Firefox's built-in bookmarks better with improved UI and session management",
   "permissions": [
     "bookmarks",
     "tabs",
@@ -17,18 +17,14 @@
     "48": "icons/icon48.png",
     "128": "icons/icon128.png"
   },
-  "browser_action": {
-    "default_icon": {
-      "16": "icons/icon16.png",
-      "48": "icons/icon48.png"
-    },
-    "default_title": "Sessions"
-  },
   "content_scripts": [
     {
-      "matches": ["about:newtab"],
-      "css": ["bookmarks/bookmarks.css"],
-      "js": ["bookmarks/bookmarks.js"]
+      "matches": ["<all_urls>"],
+      "js": ["content-scripts/bookmarks-modifier.js"],
+      "css": ["content-scripts/bookmarks-modifier.css"]
     }
+  ],
+  "web_accessible_resources": [
+    "panels/sessions-panel.html"
   ]
 }

@@ -1,0 +1,34 @@
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+    font-size: 14px;
+    margin: 0;
+    padding: 10px;
+    width: 280px;
+  }
+  
+  #sessions-container {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  h2 {
+    margin-top: 0;
+  }
+  
+  #save-session {
+    margin-bottom: 10px;
+  }
+  
+  .session-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 5px;
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+  }
+  
+  .session-item button {
+    margin-left: 5px;
+  }
