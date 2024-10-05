@@ -62,3 +62,5 @@ async function saveAllTabs() {
     })
   ));
 }
+
+export { actionHandlers, saveAllTabs };

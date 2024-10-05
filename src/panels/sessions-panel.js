@@ -49,3 +49,5 @@ document.getElementById('sessions-list').addEventListener('click', async (e) => 
   
   // Initial load
   loadSessions();
+
+  export { loadSessions, saveCurrentSession };

@@ -1,5 +1,5 @@
 {
-  "name": "enhanced-bookmarks-manager",
+  "name": "better-bookmarks-manager",
   "version": "1.0.0",
   "description": "A Firefox add-on that enhances the built-in bookmarks manager with advanced features and a more user-friendly interface.",
   "main": "index.js",
@@ -14,11 +14,25 @@
     "bookmarks",
     "session-management"
   ],
-  "author": "Your Name",
+  "author": "Radoslaw Wolnik",
   "license": "MIT",
   "devDependencies": {
-    "jest": "^27.0.6",
-    "puppeteer": "^10.2.0",
-    "web-ext": "^6.3.0"
+    "jest": "^29.5.0",
+    "jest-environment-jsdom": "^29.5.0",
+    "puppeteer": "^23.5.0",
+    "web-ext": "^8.3.0"
+  },
+  "jest": {
+    "testEnvironment": "jsdom",
+    "testEnvironmentOptions": {
+      "url": "http://localhost/"
+    },
+    "setupFiles": ["./jest.setup.js"],
+    "moduleFileExtensions": ["js", "json"],
+    "transform": {},
+    "testPathIgnorePatterns": ["/node_modules/"]
+  },
+  "directories": {
+    "test": "tests"
   }
 }

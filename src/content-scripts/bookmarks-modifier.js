@@ -38,3 +38,5 @@ observer.observe(document.documentElement, {
   childList: true,
   subtree: true
 });
+
+export { modifyBookmarksBar, toggleSessionsPanel };
