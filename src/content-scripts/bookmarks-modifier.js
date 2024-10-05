@@ -12,7 +12,7 @@ function modifyBookmarksBar() {
     }
   }
 }
-  
+
 function toggleSessionsPanel() {
   const existingPanel = document.getElementById('sessions-panel-iframe');
   if (existingPanel) {
@@ -24,7 +24,7 @@ function toggleSessionsPanel() {
     document.body.appendChild(iframe);
   }
 }
-  
+
 // Optimization: Use MutationObserver to wait for bookmarks bar to be available
 const observer = new MutationObserver((mutations, obs) => {
   const bookmarksBar = document.getElementById('PersonalToolbar');
@@ -33,7 +33,7 @@ const observer = new MutationObserver((mutations, obs) => {
     obs.disconnect();
   }
 });
-  
+
 observer.observe(document.documentElement, {
   childList: true,
   subtree: true

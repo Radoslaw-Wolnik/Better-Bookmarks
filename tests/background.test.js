@@ -1,39 +1,11 @@
-// File: tests/background.test.js
-
-import { actionHandlers, saveAllTabs } from '../src/background';
+import { actionHandlers, saveAllTabs } from '../src/background.js';
 
 describe('Background Script', () => {
   let mockBrowser;
 
   beforeEach(() => {
-    mockBrowser = {
-      runtime: {
-        onMessage: {
-          addListener: jest.fn((listener) => {
-            mockBrowser.runtime.onMessage.listener = listener;
-          })
-        }
-      },
-      bookmarks: {
-        getTree: jest.fn(),
-        create: jest.fn()
-      },
-      storage: {
-        local: {
-          get: jest.fn(),
-          set: jest.fn()
-        }
-      },
-      tabs: {
-        query: jest.fn(),
-        create: jest.fn()
-      },
-      menus: {
-        create: jest.fn()
-      }
-    };
-
-    global.browser = mockBrowser;
+    mockBrowser = global.browser;
+    jest.clearAllMocks();
   });
 
   test('handles getBookmarks action', async () => {
@@ -94,6 +66,7 @@ describe('Background Script', () => {
   });
 
   test('creates Save All Tabs menu item', () => {
+    saveAllTabs();
     expect(mockBrowser.menus.create).toHaveBeenCalledWith({
       id: "save-all-tabs",
       title: "Save All Tabs",

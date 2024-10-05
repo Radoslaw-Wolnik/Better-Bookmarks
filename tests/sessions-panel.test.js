@@ -1,9 +1,6 @@
-// File: tests/sessions-panel.test.js
-
-import { loadSessions, saveCurrentSession } from '../src/panels/sessions-panel';
+import { loadSessions, saveCurrentSession } from '../src/panels/sessions-panel.js';
 
 describe('Sessions Panel', () => {
-
   beforeEach(() => {
     document.body.innerHTML = `
       <div id="sessions-container">
@@ -13,10 +10,10 @@ describe('Sessions Panel', () => {
     `;
     global.browser = {
       runtime: {
-        sendMessage: jest.fn()
+        sendMessage: () => {}
       },
       tabs: {
-        query: jest.fn()
+        query: () => {}
       }
     };
   });
@@ -26,7 +23,7 @@ describe('Sessions Panel', () => {
       { id: '1', name: 'Session 1' },
       { id: '2', name: 'Session 2' }
     ];
-    browser.runtime.sendMessage.mockResolvedValue(mockSessions);
+    browser.runtime.sendMessage = () => Promise.resolve(mockSessions);
 
     await loadSessions();
 
@@ -37,9 +34,9 @@ describe('Sessions Panel', () => {
   });
 
   test('saveCurrentSession creates new session', async () => {
-    global.prompt = jest.fn().mockReturnValue('New Session');
-    browser.tabs.query.mockResolvedValue([{ title: 'Tab 1', url: 'https://example.com' }]);
-    browser.runtime.sendMessage.mockResolvedValue({ success: true });
+    global.prompt = () => 'New Session';
+    browser.tabs.query = () => Promise.resolve([{ title: 'Tab 1', url: 'https://example.com' }]);
+    browser.runtime.sendMessage = () => Promise.resolve({ success: true });
 
     await saveCurrentSession();
 

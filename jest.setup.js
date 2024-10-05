@@ -1,15 +1,19 @@
-function mockFn() {
-  return function mockConstructor() {
-    return mockConstructor;
-  };
+import jest from 'jest-mock';
+
+global.jest = jest;
+
+function mockFn(implementation) {
+  return jest.fn(implementation);
 }
 
 global.browser = {
   runtime: {
     sendMessage: mockFn(),
-    getURL: mockFn(path => `mocked-extension://${path}`),
+    getURL: mockFn((path) => `mocked-extension://${path}`),
     onMessage: {
-      addListener: mockFn()
+      addListener: mockFn((listener) => {
+        global.browser.runtime.onMessage.listener = listener;
+      })
     }
   },
   bookmarks: {

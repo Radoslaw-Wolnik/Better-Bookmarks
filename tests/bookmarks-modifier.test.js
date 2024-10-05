@@ -1,14 +1,17 @@
-// src/content-scripts/bookmarks-modifier.js
 import { modifyBookmarksBar, toggleSessionsPanel } from '../src/content-scripts/bookmarks-modifier.js';
 
 describe('Bookmarks Modifier', () => {
-
   beforeEach(() => {
     document.body.innerHTML = `
       <div id="PersonalToolbar">
         <div class="bookmark-item" label="Other Bookmarks"></div>
       </div>
     `;
+    global.browser = {
+      runtime: {
+        getURL: jest.fn((path) => `mocked-extension://${path}`)
+      }
+    };
   });
 
   test('modifyBookmarksBar replaces Other Bookmarks with Sessions button', () => {
