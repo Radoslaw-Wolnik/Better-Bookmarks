@@ -105,7 +105,6 @@ If you encounter any issues or have questions, please file an issue on our [GitH
 - [ ] Implement sync functionality
 - [ ] Add import/export features
 - [ ] Implement keyboard shortcuts
-- [ ] Add support for multiple languages
 
 ## Acknowledgements
 
