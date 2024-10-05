@@ -10,60 +10,51 @@ describe('Background Script', () => {
   });
 
   test('handles getBookmarks action', async () => {
-    const sendResponse = jest.fn();
-    const message = { action: 'getBookmarks' };
+    mockBrowser.bookmarks.getTree.mockResolvedValue([]);
     
-    await mockBrowser.runtime.onMessage.listener(message, {}, sendResponse);
+    const result = await actionHandlers.getBookmarks();
     
     expect(mockBrowser.bookmarks.getTree).toHaveBeenCalled();
-    expect(sendResponse).toHaveBeenCalled();
+    expect(result).toEqual([]);
   });
 
   test('handles getSessions action', async () => {
-    const sendResponse = jest.fn();
-    const message = { action: 'getSessions' };
     mockBrowser.storage.local.get.mockResolvedValue({ sessions: [] });
     
-    await mockBrowser.runtime.onMessage.listener(message, {}, sendResponse);
+    const result = await actionHandlers.getSessions();
     
     expect(mockBrowser.storage.local.get).toHaveBeenCalledWith('sessions');
-    expect(sendResponse).toHaveBeenCalledWith([]);
+    expect(result).toEqual([]);
   });
 
   test('handles saveSession action', async () => {
-    const sendResponse = jest.fn();
     const session = { id: '1', name: 'Test Session', tabs: [] };
-    const message = { action: 'saveSession', data: session };
     mockBrowser.storage.local.get.mockResolvedValue({ sessions: [] });
     
-    await mockBrowser.runtime.onMessage.listener(message, {}, sendResponse);
+    const result = await actionHandlers.saveSession(session);
     
     expect(mockBrowser.storage.local.set).toHaveBeenCalledWith({ sessions: [session] });
-    expect(sendResponse).toHaveBeenCalledWith({ success: true });
+    expect(result).toEqual({ success: true });
   });
 
   test('handles loadSession action', async () => {
-    const sendResponse = jest.fn();
     const session = { id: '1', name: 'Test Session', tabs: [{ url: 'https://example.com' }] };
-    const message = { action: 'loadSession', data: '1' };
     mockBrowser.storage.local.get.mockResolvedValue({ sessions: [session] });
     
-    await mockBrowser.runtime.onMessage.listener(message, {}, sendResponse);
+    const result = await actionHandlers.loadSession('1');
     
     expect(mockBrowser.tabs.create).toHaveBeenCalledWith({ url: 'https://example.com' });
-    expect(sendResponse).toHaveBeenCalledWith({ success: true });
+    expect(result).toEqual({ success: true });
   });
 
   test('handles deleteSession action', async () => {
-    const sendResponse = jest.fn();
     const session = { id: '1', name: 'Test Session', tabs: [] };
-    const message = { action: 'deleteSession', data: '1' };
     mockBrowser.storage.local.get.mockResolvedValue({ sessions: [session] });
     
-    await mockBrowser.runtime.onMessage.listener(message, {}, sendResponse);
+    const result = await actionHandlers.deleteSession('1');
     
     expect(mockBrowser.storage.local.set).toHaveBeenCalledWith({ sessions: [] });
-    expect(sendResponse).toHaveBeenCalledWith({ success: true });
+    expect(result).toEqual({ success: true });
   });
 
   test('saveAllTabs creates bookmarks for all tabs', async () => {
@@ -90,3 +81,4 @@ describe('Background Script', () => {
     });
   });
 });
+

@@ -1,5 +1,7 @@
 const actionHandlers = {
-  getBookmarks: () => Promise.resolve(browser.bookmarks.getTree()),
+  getBookmarks: async () => {
+    return await browser.bookmarks.getTree();
+  },
   getSessions: async () => {
     const result = await browser.storage.local.get('sessions');
     return result.sessions || [];
@@ -32,7 +34,14 @@ const actionHandlers = {
 browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
   const { action, data } = message;
   if (action in actionHandlers) {
-    actionHandlers[action](data).then(sendResponse);
+    actionHandlers[action](data)
+      .then(result => {
+        sendResponse(result);
+      })
+      .catch(error => {
+        console.error(`Error in ${action}:`, error);
+        sendResponse({ success: false, error: error.message });
+      });
     return true; // Indicates an asynchronous response
   }
 });
