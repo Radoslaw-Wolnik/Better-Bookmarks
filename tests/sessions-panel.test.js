@@ -3,6 +3,7 @@
 import { loadSessions, saveCurrentSession } from '../src/panels/sessions-panel';
 
 describe('Sessions Panel', () => {
+
   beforeEach(() => {
     document.body.innerHTML = `
       <div id="sessions-container">

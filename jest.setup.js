@@ -1,29 +1,32 @@
-global.browser = {
-    runtime: {
-      sendMessage: jest.fn(),
-      getURL: jest.fn(),
-      onMessage: {
-        addListener: jest.fn()
-      }
-    },
-    bookmarks: {
-      getTree: jest.fn(),
-      create: jest.fn()
-    },
-    storage: {
-      local: {
-        get: jest.fn(),
-        set: jest.fn()
-      }
-    },
-    tabs: {
-      query: jest.fn(),
-      create: jest.fn()
-    },
-    menus: {
-      create: jest.fn()
-    }
+function mockFn() {
+  return function mockConstructor() {
+    return mockConstructor;
   };
-  
-  // Mock the browser.runtime.getURL function
-  global.browser.runtime.getURL = jest.fn(path => `mocked-extension://${path}`);
+}
+
+global.browser = {
+  runtime: {
+    sendMessage: mockFn(),
+    getURL: mockFn(path => `mocked-extension://${path}`),
+    onMessage: {
+      addListener: mockFn()
+    }
+  },
+  bookmarks: {
+    getTree: mockFn(),
+    create: mockFn()
+  },
+  storage: {
+    local: {
+      get: mockFn(),
+      set: mockFn()
+    }
+  },
+  tabs: {
+    query: mockFn(),
+    create: mockFn()
+  },
+  menus: {
+    create: mockFn()
+  }
+};

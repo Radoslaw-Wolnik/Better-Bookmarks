@@ -3,8 +3,9 @@
   "version": "1.0.0",
   "description": "A Firefox add-on that enhances the built-in bookmarks manager with advanced features and a more user-friendly interface.",
   "main": "index.js",
+  "type": "module",
   "scripts": {
-    "test": "jest",
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
     "build": "web-ext build",
     "start": "web-ext run"
   },
@@ -14,7 +15,7 @@
     "bookmarks",
     "session-management"
   ],
-  "author": "Radoslaw Wolnik",
+  "author": "Your Name",
   "license": "MIT",
   "devDependencies": {
     "jest": "^29.5.0",
@@ -24,15 +25,11 @@
   },
   "jest": {
     "testEnvironment": "jsdom",
-    "testEnvironmentOptions": {
-      "url": "http://localhost/"
-    },
-    "setupFiles": ["./jest.setup.js"],
-    "moduleFileExtensions": ["js", "json"],
     "transform": {},
-    "testPathIgnorePatterns": ["/node_modules/"]
-  },
-  "directories": {
-    "test": "tests"
+    "moduleNameMapper": {
+      "^(\\.{1,2}/.*)\\.js$": "$1"
+    },
+    "setupFilesAfterEnv": ["<rootDir>/jest.setup.js"],
+    "testMatch": ["**/tests/**/*.test.js"]
   }
 }

@@ -1,10 +1,9 @@
-// File: tests/bookmarks-modifier.test.js
-
-import { modifyBookmarksBar, toggleSessionsPanel } from '../src/content-scripts/bookmarks-modifier';
+// src/content-scripts/bookmarks-modifier.js
+import { modifyBookmarksBar, toggleSessionsPanel } from '../src/content-scripts/bookmarks-modifier.js';
 
 describe('Bookmarks Modifier', () => {
+
   beforeEach(() => {
-    // Set up the document body
     document.body.innerHTML = `
       <div id="PersonalToolbar">
         <div class="bookmark-item" label="Other Bookmarks"></div>
