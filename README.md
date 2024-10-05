@@ -2,7 +2,7 @@
 
 ## Overview
 
-Enhanced Bookmarks Manager is a Firefox add-on that improves upon the built-in bookmarks manager with advanced features and a more user-friendly interface. It offers enhanced bookmark management, session saving and restoration, and a sleek, Chrome-inspired design.
+Better Bookmarks is a Firefox add-on that improves upon the built-in bookmarks manager with advanced features and a more user-friendly interface. It offers upgraded bookmark management, session saving and restoration, and design improvements.
 
 ## Features
 
@@ -18,7 +18,7 @@ Enhanced Bookmarks Manager is a Firefox add-on that improves upon the built-in b
 
 ## Installation
 
-1. Download the latest release from the [Releases page](https://github.com/yourusername/enhanced-bookmarks-manager/releases).
+1. Download the latest release from the [Releases page](https://github.com/radoslaw-wolnik/better-bookmarks/releases).
 2. Open Firefox and navigate to `about:addons`.
 3. Click the gear icon and select "Install Add-on From File".
 4. Select the downloaded `.xpi` file.
@@ -27,7 +27,7 @@ Enhanced Bookmarks Manager is a Firefox add-on that improves upon the built-in b
 
 ### Bookmarks Management
 
-- Access the enhanced bookmarks manager by clicking on the add-on icon in the toolbar.
+- Access the better bookmarks manager by clicking on the add-on icon in the toolbar.
 - Use the search bar to find specific bookmarks quickly.
 - Click on folder icons to expand/collapse bookmark folders.
 - Right-click on the bookmarks toolbar and select "Save All Tabs" to save all open tabs as bookmarks in a new folder.
@@ -59,11 +59,11 @@ Enhanced Bookmarks Manager is a Firefox add-on that improves upon the built-in b
 
 1. Clone the repository:
    ```
-   git clone https://github.com/yourusername/enhanced-bookmarks-manager.git
+   git clone https://github.com/yourusername/better-bookmarks.git
    ```
 2. Navigate to the project directory:
    ```
-   cd enhanced-bookmarks-manager
+   cd better-bookmarks
    ```
 3. Install dependencies:
    ```
@@ -98,7 +98,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Support
 
-If you encounter any issues or have questions, please file an issue on our [GitHub Issues page](https://github.com/yourusername/enhanced-bookmarks-manager/issues).
+If you encounter any issues or have questions, please file an issue on our [GitHub Issues page](https://github.com/radoslaw-wolnik/better-bookmarks/issues).
 
 ## Roadmap
 
