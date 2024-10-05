@@ -1,4 +1,4 @@
-# Contributing to Enhanced Bookmarks Manager
+# Contributing to Better Bookmarks
 
 We love your input! We want to make contributing to this project as easy and transparent as possible, whether it's:
 
@@ -40,7 +40,6 @@ We use GitHub issues to track public bugs. Report a bug by [opening a new issue]
 - What actually happens
 - Notes (possibly including why you think this might be happening, or stuff you tried that didn't work)
 
-People *love* thorough bug reports. I'm not even kidding.
 
 ## Use a Consistent Coding Style
 I'm again borrowing these from [Facebook's Guidelines](https://github.com/facebook/draft-js/blob/a9316a723f9e918afde44dea68b5f9f39b7d9b00/CONTRIBUTING.md)
