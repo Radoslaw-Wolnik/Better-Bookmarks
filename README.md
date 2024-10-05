@@ -80,6 +80,10 @@ To run the test suite:
 npm test
 ```
 
+## ToDo:
+ - [ ] browser.bookmarks.openInTabClosesMenu set to false should make it so the toolbar doesn't close after opening a bookmark in a tab. (ctrl + click does not close the bookmarks folder)
+ - [ ] restoring and backuping sessions 
+ 
 ## Contributing
 
 While this is primarily a personal project, contributions or suggestions are welcome. Please see the [Contributing Guide](CONTRIBUTING.md) for more details.
