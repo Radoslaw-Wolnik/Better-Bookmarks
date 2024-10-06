@@ -1,8 +1,8 @@
 {
   "manifest_version": 2,
-  "name": "Better Bookmarks and Sessions",
-  "version": "1.2",
-  "description": "Makes Firefox's built-in bookmarks better with improved UI and session management",
+  "name": "Better Bookmarks plus Sessions",
+  "version": "1.0",
+  "description": "Better bookmarks with integrated sessions management, custom styling, and sidebar",
   "permissions": [
     "bookmarks",
     "tabs",
@@ -10,7 +10,7 @@
     "menus"
   ],
   "background": {
-    "scripts": ["main.js"],
+    "scripts": ["background.js"],
     "persistent": false
   },
   "icons": {
@@ -18,6 +18,20 @@
     "48": "icons/icon48.png",
     "128": "icons/icon128.png"
   },
+  "content_scripts": [
+    {
+      "matches": [
+        "<all_urls>",
+        "about:blank?bookmarksManager"
+      ],
+      "css": ["content-scripts/bookmarks-modifier.css"],
+      "js": ["content-scripts/bookmarks-modifier.js"]
+    }
+  ],
+  "web_accessible_resources": [
+    "icons/*",
+    "sidebar/sidebar.html"
+  ],
   "sidebar_action": {
     "default_title": "Bookmarks & Sessions",
     "default_panel": "sidebar/sidebar.html",
@@ -32,5 +46,13 @@
   },
   "chrome_url_overrides" : {
     "bookmarks": "custom-bookmarks.html"
+  },
+  "browser_action": {
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    },
+    "default_title": "Better Bookmarks"
   }
 }

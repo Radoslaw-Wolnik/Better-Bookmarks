@@ -1,38 +1,3 @@
-// main.js
-browser.runtime.onInstalled.addListener(() => {
-  console.log("Extension installed");
-});
-
-// Browser action click handler
-browser.browserAction.onClicked.addListener(() => {
-  browser.browserAction.setPopup({popup: "popup/sessions-panel.html"});
-});
-
-// Listener for messages from content scripts or popup
-browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
-  const { action, data } = message;
-  if (action in actionHandlers) {
-    actionHandlers[action](data)
-      .then(result => {
-        sendResponse(result);
-      })
-      .catch(error => {
-        console.error(`Error in ${action}:`, error);
-        sendResponse({ success: false, error: error.message });
-      });
-    return true; // Indicates an asynchronous response
-  }
-});
-
-// Handle "Save All Tabs" context menu item
-browser.menus.create({
-  id: "save-all-tabs",
-  title: "Save All Tabs",
-  contexts: ["bookmark"],
-  onclick: saveAllTabs
-});
-
-// Action handlers
 const actionHandlers = {
   getBookmarks: async () => {
     return await browser.bookmarks.getTree();
@@ -63,39 +28,51 @@ const actionHandlers = {
     const updatedSessions = sessions.filter(s => s.id !== sessionId);
     await browser.storage.local.set({ sessions: updatedSessions });
     return { success: true };
+  },
+  saveAllTabs: async () => {
+    try {
+      const tabs = await browser.tabs.query({currentWindow: true});
+      if (!tabs || tabs.length === 0) {
+        return { success: false, error: 'No tabs found' };
+      }
+      const folderName = `Saved Tabs - ${new Date().toLocaleString()}`;
+      const folder = await browser.bookmarks.create({title: folderName});
+   
+      await Promise.all(tabs.map(tab =>
+        browser.bookmarks.create({
+          parentId: folder.id,
+          title: tab.title,
+          url: tab.url
+        })
+      ));
+      return { success: true, message: 'All tabs saved successfully' };
+    } catch (error) {
+      console.error('Error saving tabs:', error);
+      return { success: false, error: error.message };
+    }
+  },
+  toggleSidebar: async () => {
+    await browser.sidebarAction.toggle();
   }
 };
 
-async function saveAllTabs() {
-  try {
-    const tabs = await browser.tabs.query({currentWindow: true});
-    if (!tabs || tabs.length === 0) {
-      console.error('No tabs found');
-      return;
-    }
-    const folderName = `Saved Tabs - ${new Date().toLocaleString()}`;
-    const folder = await browser.bookmarks.create({title: folderName});
-  
-    await Promise.all(tabs.map(tab => 
-      browser.bookmarks.create({
-        parentId: folder.id,
-        title: tab.title,
-        url: tab.url
-      })
-    ));
-    console.log('All tabs saved successfully');
-  } catch (error) {
-    console.error('Error saving tabs:', error);
+browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  const { action, data } = message;
+  if (action in actionHandlers) {
+    actionHandlers[action](data)
+      .then(sendResponse)
+      .catch(error => sendResponse({ success: false, error: error.message }));
+    return true;
   }
-}
+});
 
-// Content script injection
-browser.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
-  if (changeInfo.status === 'complete' && tab.url.startsWith('http')) {
-    browser.tabs.executeScript(tabId, { file: '/content-scripts/bookmarks-modifier.js' })
-      .then(() => {
-        browser.tabs.insertCSS(tabId, { file: '/content-scripts/bookmarks-modifier.css' });
-      })
-      .catch(error => console.error('Error injecting content script:', error));
-  }
+browser.menus.create({
+  id: "save-all-tabs",
+  title: "Save All Tabs",
+  contexts: ["browser_action"],
+  onclick: () => actionHandlers.saveAllTabs()
+});
+
+browser.browserAction.onClicked.addListener(() => {
+  actionHandlers.toggleSidebar();
 });

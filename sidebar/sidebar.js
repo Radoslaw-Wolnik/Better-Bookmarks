@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 async function loadBookmarks() {
-    const bookmarks = await browser.bookmarks.getTree();
+    const bookmarks = await browser.runtime.sendMessage({action: "getBookmarks"});
     const container = document.getElementById('bookmarks-list');
     renderBookmarks(bookmarks[0], container);
 }
@@ -45,10 +45,13 @@ async function loadSessions() {
 async function saveCurrentSession() {
     const sessionName = prompt('Enter a name for this session:');
     if (sessionName) {
-        await browser.runtime.sendMessage({
-            action: "saveSession",
-            data: { name: sessionName, id: Date.now().toString(), timestamp: Date.now() }
-        });
+        const tabs = await browser.tabs.query({ currentWindow: true });
+        const session = {
+            id: Date.now().toString(),
+            name: sessionName,
+            tabs: tabs.map(tab => ({ title: tab.title, url: tab.url }))
+        };
+        await browser.runtime.sendMessage({ action: 'saveSession', data: session });
         loadSessions();
     }
 }
