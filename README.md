@@ -83,7 +83,10 @@ npm test
 ## ToDo:
  - [ ] browser.bookmarks.openInTabClosesMenu set to false should make it so the toolbar doesn't close after opening a bookmark in a tab. (ctrl + click does not close the bookmarks folder)
  - [ ] restoring and backuping sessions 
- 
+ - [ ] same open/closed folders as before closing the sidebar (persisting state and not blank each time opened - or opened tollbar dir as defualt)
+ - [ ] na bok otwierjące się foldery albo okienka - nie w dół
+ - [ ] can i make custom toolbar (ctrl+Shift+B thingy)
+ - [ ] eneble scrolling lol
 ## Contributing
 
 While this is primarily a personal project, contributions or suggestions are welcome. Please see the [Contributing Guide](CONTRIBUTING.md) for more details.

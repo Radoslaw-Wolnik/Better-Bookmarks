@@ -61,7 +61,7 @@ body {
 .bookmark-item, .session-item {
     padding: 5px;
     margin: 2px 0;
-    background: var(--sidebar-highlight-background-color, white);
+    background: var(--sidebar-highlight-background-color, none);
     color: var(--sidebar-highlight-text-color, #333);
     border-radius: 3px;
     transition: background-color 0.3s;
