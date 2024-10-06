@@ -1,6 +1,6 @@
 {
   "name": "better-bookmarks-manager",
-  "version": "1.2.0",
+  "version": "2.0.0",
   "description": "A Firefox add-on that enhances the built-in bookmarks manager with advanced features and a more user-friendly interface.",
   "main": "index.js",
   "scripts": {

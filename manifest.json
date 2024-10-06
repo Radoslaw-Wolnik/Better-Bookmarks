@@ -1,7 +1,7 @@
 {
-  "manifest_version": 2,
+  "manifest_version": 3,
   "name": "Better Bookmarks plus Sessions",
-  "version": "1.0",
+  "version": "2.1",
   "description": "Better bookmarks with integrated sessions management, custom styling, and sidebar",
   "permissions": [
     "bookmarks",
@@ -10,8 +10,7 @@
     "menus"
   ],
   "background": {
-    "scripts": ["background.js"],
-    "persistent": false
+    "scripts": ["background.js"]
   },
   "icons": {
     "16": "icons/icon16.png",
@@ -21,17 +20,19 @@
   "content_scripts": [
     {
       "matches": [
-        "<all_urls>",
-        "about:blank?bookmarksManager"
+        "<all_urls>"
       ],
       "css": ["content-scripts/bookmarks-modifier.css"],
       "js": ["content-scripts/bookmarks-modifier.js"]
     }
   ],
-  "web_accessible_resources": [
-    "icons/*",
-    "sidebar/sidebar.html"
-  ],
+  "web_accessible_resources": [{
+    "resources": [
+      "icons/*",
+      "sidebar/sidebar.html"
+    ],
+    "matches": ["<all_urls>"]
+  }],
   "sidebar_action": {
     "default_title": "Bookmarks & Sessions",
     "default_panel": "sidebar/sidebar.html",
@@ -44,10 +45,7 @@
       }
     }
   },
-  "chrome_url_overrides" : {
-    "bookmarks": "custom-bookmarks.html"
-  },
-  "browser_action": {
+  "action": {
     "default_icon": {
       "16": "icons/icon16.png",
       "48": "icons/icon48.png",

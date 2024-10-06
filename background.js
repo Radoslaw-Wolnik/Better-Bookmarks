@@ -73,6 +73,6 @@ browser.menus.create({
   onclick: () => actionHandlers.saveAllTabs()
 });
 
-browser.browserAction.onClicked.addListener(() => {
+browser.action.onClicked.addListener(() => {
   actionHandlers.toggleSidebar();
 });

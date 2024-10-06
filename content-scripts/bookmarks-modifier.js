@@ -53,18 +53,17 @@ function injectCustomUI() {
   }
   
   function modifyBookmarksUI() {
-    document.body.style.backgroundColor = '#f0f0f0';
-    const bookmarkItems = document.querySelectorAll('.bookmark-item');
-    bookmarkItems.forEach(item => {
-      item.style.borderRadius = '5px';
-      item.style.margin = '5px 0';
-      item.style.padding = '10px';
-      item.style.backgroundColor = 'white';
-    });
-  }
-  
-  if (window.location.href === "about:blank?bookmarksManager") {
-    injectCustomUI();
+    if (window.location.href.startsWith("about:")) {
+      document.body.style.backgroundColor = '#f0f0f0';
+      const bookmarkItems = document.querySelectorAll('.bookmark-item');
+      bookmarkItems.forEach(item => {
+        item.style.borderRadius = '5px';
+        item.style.margin = '5px 0';
+        item.style.padding = '10px';
+        item.style.backgroundColor = 'white';
+      });
+      injectCustomUI();
+    }
   }
   
   modifyBookmarksUI();
