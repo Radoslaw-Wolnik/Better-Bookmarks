@@ -3,7 +3,6 @@
   "version": "1.0.0",
   "description": "A Firefox add-on that enhances the built-in bookmarks manager with advanced features and a more user-friendly interface.",
   "main": "index.js",
-  "type": "module",
   "scripts": {
     "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
     "build": "web-ext build",
