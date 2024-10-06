@@ -71,5 +71,3 @@ async function saveCurrentSession() {
     console.error('Error saving session:', error);
   }
 }
-
-export { loadSessions, saveCurrentSession, handleLoadSession, handleDeleteSession };
