@@ -8,16 +8,32 @@
 </head>
 <body>
     <div id="sidebar-container">
+        <div id="toggle-container">
+            <button id="toggle-bookmarks" class="active">
+                <span class="icon">🔖</span> Bookmarks
+            </button>
+            <button id="toggle-sessions">
+                <span class="icon">📚</span> Sessions
+            </button>
+        </div>
+        
+        <div id="search-container">
+            <input type="text" id="search-input" placeholder="Search...">
+        </div>
+    
         <div id="bookmarks-section">
-            <h2>Bookmarks</h2>
             <div id="bookmarks-list"></div>
         </div>
-        <div id="sessions-section">
-            <h2>Sessions</h2>
-            <button id="save-session">Save Current Session</button>
+    
+        <div id="sessions-section" style="display: none;">
             <div id="sessions-list"></div>
+            <button id="save-session">
+                <span class="icon">💾</span> Save Current Session
+            </button>
         </div>
     </div>
+    
     <script src="sidebar.js"></script>
-</body>
-</html>
+  </body>
+  </html>
+  

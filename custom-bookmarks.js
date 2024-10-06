@@ -13,7 +13,8 @@ function renderBookmarks(node, container, level = 0) {
         const folderElement = document.createElement('div');
         folderElement.className = 'bookmark-folder';
         folderElement.style.marginLeft = `${level * 20}px`;
-        folderElement.textContent = node.title || 'Bookmarks';
+        folderElement.textContent = truncateText(node.title || 'Bookmarks', 25);
+        folderElement.title = node.title || 'Bookmarks'; // Full title on hover
         container.appendChild(folderElement);
 
         node.children.forEach(child => renderBookmarks(child, container, level + 1));
@@ -23,9 +24,15 @@ function renderBookmarks(node, container, level = 0) {
         bookmarkElement.style.marginLeft = `${level * 20}px`;
         const link = document.createElement('a');
         link.href = node.url;
-        link.textContent = node.title;
+        link.textContent = truncateText(node.title, 25);
+        link.title = node.title;
         link.target = '_blank';
         bookmarkElement.appendChild(link);
         container.appendChild(bookmarkElement);
     }
+}
+
+function truncateText(text, maxLength) {
+    if (text.length <= maxLength) return text;
+    return text.slice(0, maxLength - 3) + '...';
 }

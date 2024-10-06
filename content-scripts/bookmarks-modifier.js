@@ -1,69 +1,84 @@
-function injectCustomUI() {
-    const toolbar = document.createElement('div');
-    toolbar.id = 'enhanced-toolbar';
-    toolbar.innerHTML = `
-      <button id="sessions-button">Sessions</button>
-      <div id="sessions-panel" style="display:none;">
-        <button id="save-session">Save Current Session</button>
-        <div id="sessions-list"></div>
+function createChromelikeUI() {
+    const container = document.createElement('div');
+    container.id = 'chrome-like-bookmarks';
+    container.innerHTML = `
+      <div id="bookmark-toolbar">
+        <button id="add-bookmark">Add bookmark</button>
+        <input type="text" id="search-bookmarks" placeholder="Search bookmarks">
       </div>
+      <div id="bookmarks-tree"></div>
     `;
-    document.body.insertBefore(toolbar, document.body.firstChild);
+    document.body.appendChild(container);
   
-    document.getElementById('sessions-button').addEventListener('click', toggleSessionsPanel);
-    document.getElementById('save-session').addEventListener('click', saveCurrentSession);
+    document.getElementById('add-bookmark').addEventListener('click', addBookmark);
+    document.getElementById('search-bookmarks').addEventListener('input', searchBookmarks);
   
-    loadSessions();
+    loadBookmarks();
   }
   
-  function toggleSessionsPanel() {
-    const panel = document.getElementById('sessions-panel');
-    panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+  async function loadBookmarks() {
+    const bookmarks = await browser.runtime.sendMessage({action: "getBookmarks"});
+    const treeContainer = document.getElementById('bookmarks-tree');
+    renderBookmarkTree(bookmarks[0], treeContainer);
   }
   
-  async function loadSessions() {
-    const sessions = await browser.runtime.sendMessage({action: "getSessions"});
-    const sessionsList = document.getElementById('sessions-list');
-    sessionsList.innerHTML = '';
-    
-    sessions.forEach(session => {
-      const sessionElement = document.createElement('div');
-      sessionElement.textContent = session.name;
-      sessionElement.addEventListener('click', () => loadSession(session.id));
-      sessionsList.appendChild(sessionElement);
+  function renderBookmarkTree(node, container, level = 0) {
+    if (node.children) {
+      const folderElement = document.createElement('div');
+      folderElement.className = 'bookmark-folder';
+      folderElement.style.paddingLeft = `${level * 20}px`;
+      folderElement.innerHTML = `
+        <span class="folder-icon">📁</span>
+        <span class="folder-name">${node.title || 'Bookmarks'}</span>
+      `;
+      container.appendChild(folderElement);
+  
+      const childrenContainer = document.createElement('div');
+      childrenContainer.className = 'folder-children';
+      container.appendChild(childrenContainer);
+  
+      node.children.forEach(child => renderBookmarkTree(child, childrenContainer, level + 1));
+    } else {
+      const bookmarkElement = document.createElement('div');
+      bookmarkElement.className = 'bookmark-item';
+      bookmarkElement.style.paddingLeft = `${level * 20}px`;
+      bookmarkElement.innerHTML = `
+        <span class="bookmark-icon">🔖</span>
+        <a href="${node.url}" target="_blank">${node.title}</a>
+      `;
+      container.appendChild(bookmarkElement);
+    }
+  }
+  
+  function addBookmark() {
+    const url = prompt('Enter the URL of the bookmark:');
+    const title = prompt('Enter the title of the bookmark:');
+    if (url && title) {
+      browser.runtime.sendMessage({
+        action: 'createBookmark',
+        data: { url, title }
+      }).then(() => loadBookmarks());
+    }
+  }
+  
+  function searchBookmarks() {
+    const searchTerm = document.getElementById('search-bookmarks').value.toLowerCase();
+    const bookmarkItems = document.querySelectorAll('.bookmark-item');
+    bookmarkItems.forEach(item => {
+      const title = item.textContent.toLowerCase();
+      item.style.display = title.includes(searchTerm) ? 'block' : 'none';
     });
   }
   
-  async function saveCurrentSession() {
-    const sessionName = prompt('Enter a name for this session:');
-    if (sessionName) {
-      const tabs = await browser.tabs.query({ currentWindow: true });
-      const session = {
-        id: Date.now().toString(),
-        name: sessionName,
-        tabs: tabs.map(tab => ({ title: tab.title, url: tab.url }))
-      };
-      await browser.runtime.sendMessage({ action: 'saveSession', data: session });
-      loadSessions();
+  function interceptCtrlB(event) {
+    if (event.ctrlKey && event.key === 'b') {
+      event.preventDefault();
+      browser.runtime.sendMessage({action: "toggleSidebar"});
     }
   }
   
-  function loadSession(sessionId) {
-    browser.runtime.sendMessage({action: "loadSession", data: sessionId});
-  }
+  document.addEventListener('keydown', interceptCtrlB);
   
-  function modifyBookmarksUI() {
-    if (window.location.href.startsWith("about:")) {
-      document.body.style.backgroundColor = '#f0f0f0';
-      const bookmarkItems = document.querySelectorAll('.bookmark-item');
-      bookmarkItems.forEach(item => {
-        item.style.borderRadius = '5px';
-        item.style.margin = '5px 0';
-        item.style.padding = '10px';
-        item.style.backgroundColor = 'white';
-      });
-      injectCustomUI();
-    }
+  if (window.location.href.startsWith("about:")) {
+    createChromelikeUI();
   }
-  
-  modifyBookmarksUI();

@@ -1,60 +1,69 @@
 body {
-  padding-top: 40px;
-  background-color: #f0f0f0 !important;
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #f1f3f4;
 }
 
-#enhanced-toolbar {
-  position: fixed;
-  top: 0;
-  left: 0;
+#chrome-like-bookmarks {
   width: 100%;
-  background: rgba(255, 255, 255, 0.9);
-  backdrop-filter: blur(10px);
-  z-index: 9999;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+#bookmark-toolbar {
+  display: flex;
+  padding: 10px;
+  background-color: #ffffff;
+  border-bottom: 1px solid #dadce0;
+}
+
+#add-bookmark {
+  background-color: #1a73e8;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-right: 10px;
+}
+
+#search-bookmarks {
+  flex-grow: 1;
+  padding: 8px;
+  border: 1px solid #dadce0;
+  border-radius: 4px;
+}
+
+#bookmarks-tree {
+  padding: 10px;
+  overflow-y: auto;
+}
+
+.bookmark-folder, .bookmark-item {
+  padding: 8px 0;
   display: flex;
   align-items: center;
-  padding: 5px 10px;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
 
-#sessions-button {
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 5px 10px;
-  margin: 0 5px;
-  border-radius: 3px;
-  transition: background-color 0.3s;
+.folder-icon, .bookmark-icon {
+  margin-right: 8px;
 }
 
-#sessions-button:hover {
-  background-color: rgba(0,0,0,0.1);
+.folder-name {
+  font-weight: bold;
 }
 
-#sessions-panel {
-  position: absolute;
-  top: 100%;
-  right: 0;
-  background: white;
-  border-radius: 5px;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-  padding: 10px;
+.bookmark-item a {
+  color: #202124;
+  text-decoration: none;
 }
 
-#save-session {
-  width: 100%;
-  padding: 5px;
-  margin-bottom: 10px;
+.bookmark-item a:hover {
+  text-decoration: underline;
 }
 
-.bookmark-item {
-  background-color: white !important;
-  border-radius: 5px !important;
-  margin: 5px 0 !important;
-  padding: 10px !important;
-  transition: background-color 0.3s !important;
-}
-
-.bookmark-item:hover {
-  background-color: #f5f5f5 !important;
+.folder-children {
+  margin-left: 20px;
 }

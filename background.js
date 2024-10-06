@@ -1,3 +1,5 @@
+let sidebarOpen = false; // Make sure this is globally available
+
 const actionHandlers = {
   getBookmarks: async () => {
     return await browser.bookmarks.getTree();
@@ -52,8 +54,15 @@ const actionHandlers = {
     }
   },
   toggleSidebar: async () => {
-    await browser.sidebarAction.toggle();
-  }
+    sidebarOpen = !sidebarOpen;
+    if (sidebarOpen) {
+      await browser.sidebarAction.open();
+    } else {
+      await browser.sidebarAction.close();
+    }
+    return { success: true, isOpen: sidebarOpen };
+  },
+
 };
 
 browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
@@ -66,13 +75,22 @@ browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
   }
 });
 
+
 browser.menus.create({
   id: "save-all-tabs",
   title: "Save All Tabs",
-  contexts: ["browser_action"],
+  contexts: ["action"],
   onclick: () => actionHandlers.saveAllTabs()
 });
 
+
 browser.action.onClicked.addListener(() => {
+  console.log("icon clicked");
   actionHandlers.toggleSidebar();
+});
+
+browser.commands.onCommand.addListener((command) => {
+  if (command === "_execute_sidebar_action") {
+    actionHandlers.toggleSidebar();
+  }
 });

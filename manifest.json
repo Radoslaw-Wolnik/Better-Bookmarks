@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Better Bookmarks plus Sessions",
-  "version": "2.1",
+  "version": "2.1.3",
   "description": "Better bookmarks with integrated sessions management, custom styling, and sidebar",
   "permissions": [
     "bookmarks",
@@ -20,7 +20,8 @@
   "content_scripts": [
     {
       "matches": [
-        "<all_urls>"
+        "<all_urls>",
+        "about:blank?bookmarksManager"
       ],
       "css": ["content-scripts/bookmarks-modifier.css"],
       "js": ["content-scripts/bookmarks-modifier.js"]
@@ -41,8 +42,9 @@
   "commands": {
     "_execute_sidebar_action": {
       "suggested_key": {
-        "default": "Ctrl+B"
-      }
+        "default": "Ctrl+Alt+B"
+      },
+      "description": "Toggle the bookmarks sidebar"
     }
   },
   "action": {
