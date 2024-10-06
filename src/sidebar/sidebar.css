@@ -1,0 +1,47 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 10px;
+    background: #f0f0f0;
+}
+
+#sidebar-container {
+    display: flex;
+    flex-direction: column;
+}
+
+h2 {
+    margin-top: 0;
+    color: #333;
+}
+
+#bookmarks-list, #sessions-list {
+    margin-bottom: 20px;
+}
+
+.bookmark-item, .session-item {
+    padding: 5px;
+    margin: 5px 0;
+    background: white;
+    border-radius: 3px;
+    transition: background-color 0.3s;
+}
+
+.bookmark-item:hover, .session-item:hover {
+    background-color: #e0e0e0;
+}
+
+#save-session {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    background-color: #0066cc;
+    color: white;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+}
+
+#save-session:hover {
+    background-color: #0056b3;
+}

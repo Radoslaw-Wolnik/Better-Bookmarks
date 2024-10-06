@@ -18,13 +18,19 @@
     "48": "icons/icon48.png",
     "128": "icons/icon128.png"
   },
-  "browser_action": {
-    "default_icon": {
-      "16": "icons/icon16.png",
-      "48": "icons/icon48.png",
-      "128": "icons/icon128.png"
-    },
-    "default_title": "Better Bookmarks and Sessions",
-    "default_popup": "popup/sessions-panel.html"
+  "sidebar_action": {
+    "default_title": "Bookmarks & Sessions",
+    "default_panel": "sidebar/sidebar.html",
+    "default_icon": "icons/icon48.png"
+  },
+  "commands": {
+    "_execute_sidebar_action": {
+      "suggested_key": {
+        "default": "Ctrl+B"
+      }
+    }
+  },
+  "chrome_url_overrides" : {
+    "bookmarks": "custom-bookmarks.html"
   }
 }
