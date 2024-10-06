@@ -3,6 +3,11 @@ browser.runtime.onInstalled.addListener(() => {
   console.log("Extension installed");
 });
 
+// Browser action click handler
+browser.browserAction.onClicked.addListener(() => {
+  browser.browserAction.setPopup({popup: "popup/sessions-panel.html"});
+});
+
 // Listener for messages from content scripts or popup
 browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
   const { action, data } = message;

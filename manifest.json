@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "Better Bookmarks and Sessions",
-  "version": "1.0",
+  "version": "1.2",
   "description": "Makes Firefox's built-in bookmarks better with improved UI and session management",
   "permissions": [
     "bookmarks",
@@ -19,11 +19,12 @@
     "128": "icons/icon128.png"
   },
   "browser_action": {
-    "default_popup": "popup/sessions-panel.html",
     "default_icon": {
       "16": "icons/icon16.png",
       "48": "icons/icon48.png",
       "128": "icons/icon128.png"
-    }
+    },
+    "default_title": "Better Bookmarks and Sessions",
+    "default_popup": "popup/sessions-panel.html"
   }
 }
