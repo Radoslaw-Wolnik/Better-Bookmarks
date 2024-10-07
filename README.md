@@ -81,7 +81,9 @@ npm test
 ```
 
 ## ToDo:
- - [ ] restoring and backuping sessions 
+ - [ ] restoring and backuping sessions
+ - [ ] solve issue with scrolling the sidebar
+ - [ ] add a popup - better then defualt one and prettier and with session management (opened when pressing addon icon)
  - [ ] na bok otwierjące się foldery albo okienka - nie w dół
 
 ## Contributing
