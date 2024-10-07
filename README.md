@@ -85,6 +85,7 @@ npm test
  - [ ] solve issue with scrolling the sidebar
  - [ ] add a popup - better then defualt one and prettier and with session management (opened when pressing addon icon)
  - [ ] na bok otwierjące się foldery albo okienka - nie w dół
+ - [ ] check if npm test works (also in package mby we could change the script to just "test" : "jest" insted of curr one)
 
 ## Contributing
 
