@@ -1,7 +1,8 @@
 import { jest } from '@jest/globals';
-import { handleLoadSession, handleDeleteSession, loadSessions, saveCurrentSession } from '../src/panels/sessions-panel.js';
+import * as sessionsPanel from '../src/panels/sessions-panel.js';
 
 describe('Sessions Panel', () => {
+
   beforeEach(() => {
     document.body.innerHTML = `
       <div id="sessions-container">
@@ -9,14 +10,7 @@ describe('Sessions Panel', () => {
         <div id="sessions-list"></div>
       </div>
     `;
-    global.browser = {
-      runtime: {
-        sendMessage: jest.fn()
-      },
-      tabs: {
-        query: jest.fn()
-      }
-    };
+    resetAllMocks();
   });
 
   test('loadSessions populates sessions list', async () => {
@@ -26,7 +20,7 @@ describe('Sessions Panel', () => {
     ];
     browser.runtime.sendMessage.mockResolvedValue(mockSessions);
 
-    await loadSessions();
+    await sessionsPanel.loadSessions();
 
     const sessionsList = document.getElementById('sessions-list');
     expect(sessionsList.children.length).toBe(2);
@@ -35,11 +29,11 @@ describe('Sessions Panel', () => {
   });
 
   test('saveCurrentSession creates new session', async () => {
-    global.prompt = () => 'New Session';
+    global.prompt = jest.fn().mockReturnValue('New Session');
     browser.tabs.query.mockResolvedValue([{ title: 'Tab 1', url: 'https://example.com' }]);
     browser.runtime.sendMessage.mockResolvedValue({ success: true });
 
-    await saveCurrentSession();
+    await sessionsPanel.saveCurrentSession();
 
     expect(browser.runtime.sendMessage).toHaveBeenCalledWith({
       action: 'saveSession',
@@ -50,18 +44,8 @@ describe('Sessions Panel', () => {
     });
   });
 
-  test('handles load session button click', async () => {
-    /*
-    document.getElementById('sessions-list').innerHTML = `
-      <div class="session-item">
-        <button class="load-session" data-session-id="1">Load</button>
-      </div>
-    `;
-
-    const loadButton = document.querySelector('.load-session');
-    loadButton.click();
-    */
-    handleLoadSession('1');
+  test('handleLoadSession sends correct message', () => {
+    sessionsPanel.handleLoadSession('1');
     
     expect(browser.runtime.sendMessage).toHaveBeenCalledWith({
       action: 'loadSession',
@@ -69,22 +53,30 @@ describe('Sessions Panel', () => {
     });
   });
 
-  test('handles delete session button click', async () => {
-    /*
-    document.getElementById('sessions-list').innerHTML = `
-      <div class="session-item">
-        <button class="delete-session" data-session-id="1">Delete</button>
-      </div>
-    `;
+  test('handleDeleteSession sends correct message and reloads sessions', async () => {
+    browser.runtime.sendMessage.mockResolvedValue({ success: true });
 
-    const deleteButton = document.querySelector('.delete-session');
-    deleteButton.click();
-    */
-    handleDeleteSession('1');
+    await sessionsPanel.handleDeleteSession('1');
 
     expect(browser.runtime.sendMessage).toHaveBeenCalledWith({
       action: 'deleteSession',
       data: '1'
     });
+    // Check if loadSessions was called after deletion
+    expect(browser.runtime.sendMessage).toHaveBeenCalledWith({ action: 'getSessions' });
+  });
+
+  test('Event listeners are set up correctly', () => {
+    const addEventListenerSpy = jest.spyOn(document, 'addEventListener');
+
+    sessionsPanel.initializeEventListeners();
+
+    expect(addEventListenerSpy).toHaveBeenCalledWith('DOMContentLoaded', expect.any(Function));
+    
+    const saveSessionButton = document.getElementById('save-session');
+    const clickEvent = new Event('click');
+    saveSessionButton.dispatchEvent(clickEvent);
+
+    expect(browser.tabs.query).toHaveBeenCalled();
   });
 });

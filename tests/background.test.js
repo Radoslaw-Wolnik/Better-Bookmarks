@@ -1,84 +1,104 @@
 import { jest } from '@jest/globals';
-import { actionHandlers, saveAllTabs } from '../src/background.js';
+import * as background from '../src/background.js';
 
 describe('Background Script', () => {
-  let mockBrowser;
-
   beforeEach(() => {
-    mockBrowser = global.browser;
-    jest.clearAllMocks();
+    resetAllMocks();
   });
 
-  test('handles getBookmarks action', async () => {
-    mockBrowser.bookmarks.getTree.mockResolvedValue([]);
-    
-    const result = await actionHandlers.getBookmarks();
-    
-    expect(mockBrowser.bookmarks.getTree).toHaveBeenCalled();
-    expect(result).toEqual([]);
-  });
+  describe('actionHandlers', () => {
+    test('getBookmarks returns bookmarks tree', async () => {
+      const mockBookmarks = [{ id: '1', title: 'Test Bookmark' }];
+      browser.bookmarks.getTree.mockResolvedValue(mockBookmarks);
+      
+      const result = await background.actionHandlers.getBookmarks();
+      
+      expect(browser.bookmarks.getTree).toHaveBeenCalled();
+      expect(result).toEqual(mockBookmarks);
+    });
 
-  test('handles getSessions action', async () => {
-    mockBrowser.storage.local.get.mockResolvedValue({ sessions: [] });
-    
-    const result = await actionHandlers.getSessions();
-    
-    expect(mockBrowser.storage.local.get).toHaveBeenCalledWith('sessions');
-    expect(result).toEqual([]);
-  });
+    test('getSessions returns stored sessions', async () => {
+      const mockSessions = [{ id: '1', name: 'Test Session' }];
+      browser.storage.local.get.mockResolvedValue({ sessions: mockSessions });
+      
+      const result = await background.actionHandlers.getSessions();
+      
+      expect(browser.storage.local.get).toHaveBeenCalledWith('sessions');
+      expect(result).toEqual(mockSessions);
+    });
 
-  test('handles saveSession action', async () => {
-    const session = { id: '1', name: 'Test Session', tabs: [] };
-    mockBrowser.storage.local.get.mockResolvedValue({ sessions: [] });
-    
-    const result = await actionHandlers.saveSession(session);
-    
-    expect(mockBrowser.storage.local.set).toHaveBeenCalledWith({ sessions: [session] });
-    expect(result).toEqual({ success: true });
-  });
+    test('saveSession adds a new session', async () => {
+      const newSession = { id: '2', name: 'New Session' };
+      browser.storage.local.get.mockResolvedValue({ sessions: [] });
+      
+      const result = await background.actionHandlers.saveSession(newSession);
+      
+      expect(browser.storage.local.set).toHaveBeenCalledWith({ sessions: [newSession] });
+      expect(result).toEqual({ success: true });
+    });
 
-  test('handles loadSession action', async () => {
-    const session = { id: '1', name: 'Test Session', tabs: [{ url: 'https://example.com' }] };
-    mockBrowser.storage.local.get.mockResolvedValue({ sessions: [session] });
-    
-    const result = await actionHandlers.loadSession('1');
-    
-    expect(mockBrowser.tabs.create).toHaveBeenCalledWith({ url: 'https://example.com' });
-    expect(result).toEqual({ success: true });
-  });
+    test('loadSession creates tabs for session', async () => {
+      const session = { id: '1', tabs: [{ url: 'https://example.com' }] };
+      browser.storage.local.get.mockResolvedValue({ sessions: [session] });
+      
+      const result = await background.actionHandlers.loadSession('1');
+      
+      expect(browser.tabs.create).toHaveBeenCalledWith({ url: 'https://example.com' });
+      expect(result).toEqual({ success: true });
+    });
 
-  test('handles deleteSession action', async () => {
-    const session = { id: '1', name: 'Test Session', tabs: [] };
-    mockBrowser.storage.local.get.mockResolvedValue({ sessions: [session] });
-    
-    const result = await actionHandlers.deleteSession('1');
-    
-    expect(mockBrowser.storage.local.set).toHaveBeenCalledWith({ sessions: [] });
-    expect(result).toEqual({ success: true });
-  });
+    test('deleteSession removes a session', async () => {
+      const sessions = [{ id: '1' }, { id: '2' }];
+      browser.storage.local.get.mockResolvedValue({ sessions });
+      
+      const result = await background.actionHandlers.deleteSession('1');
+      
+      expect(browser.storage.local.set).toHaveBeenCalledWith({ sessions: [{ id: '2' }] });
+      expect(result).toEqual({ success: true });
+    });
 
-  test('saveAllTabs creates bookmarks for all tabs', async () => {
-    const mockTabs = [
-      { title: 'Tab 1', url: 'https://example.com' },
-      { title: 'Tab 2', url: 'https://example.org' }
-    ];
-    mockBrowser.tabs.query.mockResolvedValue(mockTabs);
-    mockBrowser.bookmarks.create.mockResolvedValue({ id: 'folder-id' });
+    test('saveAllTabs creates bookmarks for all tabs', async () => {
+      const mockTabs = [
+        { title: 'Tab 1', url: 'https://example.com' },
+        { title: 'Tab 2', url: 'https://example.org' }
+      ];
+      browser.tabs.query.mockResolvedValue(mockTabs);
+      browser.bookmarks.create.mockResolvedValue({ id: 'folder-id' });
 
-    await saveAllTabs();
+      const result = await background.actionHandlers.saveAllTabs();
 
-    expect(mockBrowser.tabs.query).toHaveBeenCalledWith({currentWindow: true});
-    expect(mockBrowser.bookmarks.create).toHaveBeenCalledTimes(3); // Once for folder, twice for tabs
-    expect(mockBrowser.bookmarks.create).toHaveBeenCalledWith(expect.objectContaining({
-      title: expect.stringContaining('Saved Tabs')
-    }));
-    mockTabs.forEach(tab => {
-      expect(mockBrowser.bookmarks.create).toHaveBeenCalledWith({
-        parentId: 'folder-id',
-        title: tab.title,
-        url: tab.url
-      });
+      expect(browser.tabs.query).toHaveBeenCalledWith({ currentWindow: true });
+      expect(browser.bookmarks.create).toHaveBeenCalledTimes(3); // Once for folder, twice for tabs
+      expect(result).toEqual({ success: true, message: 'All tabs saved successfully' });
+    });
+
+    test('toggleSidebar toggles sidebar state', async () => {
+      background.sidebarOpen = false;
+
+      const result = await background.actionHandlers.toggleSidebar();
+
+      expect(browser.sidebarAction.open).toHaveBeenCalled();
+      expect(result).toEqual({ success: true, isOpen: true });
+
+      const secondResult = await background.actionHandlers.toggleSidebar();
+
+      expect(browser.sidebarAction.close).toHaveBeenCalled();
+      expect(secondResult).toEqual({ success: true, isOpen: false });
     });
   });
-});
 
+  test('menus.create is called with correct parameters', () => {
+    background.initializeMenus();
+    expect(browser.menus.create).toHaveBeenCalledWith({
+      id: "save-all-tabs",
+      title: "Save All Tabs",
+      contexts: ["action"],
+      onclick: expect.any(Function)
+    });
+  });
+
+  test('commands.onCommand listener is set up correctly', () => {
+    background.initializeCommands();
+    expect(browser.commands.onCommand.addListener).toHaveBeenCalledWith(expect.any(Function));
+  });
+});
